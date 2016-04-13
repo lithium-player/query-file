@@ -1,5 +1,9 @@
 # query-file
 
+[![Build Status](https://travis-ci.org/lithium-player/query-file.svg?branch=master)](https://travis-ci.org/lithium-player/query-file)
+[![Coverage Status](https://coveralls.io/repos/github/lithium-player/query-file/badge.svg?branch=master)](https://coveralls.io/github/lithium-player/query-file?branch=master)
+[![Clippy Linting Result](https://clippy.bashy.io/github/lithium-player/query-file/master/badge.svg)](https://clippy.bashy.io/github/lithium-player//query-file/master/log)
+
 A rust library to query file information for [liquery](https://github.com/lithium-player/query).
 
 ## License
