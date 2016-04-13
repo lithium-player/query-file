@@ -5,25 +5,53 @@ extern crate liquery;
 extern crate mime_guess;
 
 use std::path::Path;
-use std::fs::{File, Metadata};
+use std::fs::Metadata;
 
 use liquery::Queryable;
 
-struct QueryFile {
+pub struct QueryFile<'a> {
     metadata: Metadata,
+    path: &'a Path,
 }
 
-impl QueryFile {
-    pub fn new(path: &Path) -> std::io::Result<Self> {
-        let file = try!(File::open(path));
-        Ok(QueryFile { metadata: try!(file.metadata()) })
+impl <'a> QueryFile<'a> {
+    pub fn new(path: &'a Path) -> std::io::Result<Self> {
+        Ok(QueryFile {
+            metadata: try!(path.metadata()),
+            path: path,
+        })
     }
 }
 
-impl Queryable for QueryFile {
+impl <'a>  Queryable for QueryFile<'a> {
     fn query(&self, key: &str) -> Option<String> {
         match key {
             "size" => Some(format!("{}", self.metadata.len())),
+            "filetype" => {
+                let filetype = self.metadata.file_type();
+                if filetype.is_symlink() {
+                    Some("symlink".to_owned())
+                } else if filetype.is_dir() {
+                    Some("directory".to_owned())
+                } else {
+                    Some("file".to_owned())
+                }
+            },
+            "extension" => match self.path.extension() {
+                Some(ostr) => match ostr.to_str() {
+                    Some(pstr) => Some(pstr.to_owned()),
+                    None => None,
+                },
+                None => None,
+            },
+            "filename" => match self.path.file_name() {
+                Some(ostr) => match ostr.to_str() {
+                    Some(pstr) => Some(pstr.to_owned()),
+                    None => None,
+                },
+                None => None,
+            },
+
             _ => None,
         }
     }
