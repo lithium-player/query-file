@@ -62,3 +62,11 @@ fn file_extension_dir() {
 
     assert_eq!(None, queryable.query("extension"));
 }
+
+#[test]
+fn file_mime() {
+    let path = Path::new("tests/file_1b.txt");
+    let queryable = QueryFile::new(path).unwrap();
+
+    assert_eq!("text/plain", &queryable.query("mimetype").unwrap());
+}

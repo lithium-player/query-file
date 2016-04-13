@@ -51,7 +51,7 @@ impl <'a>  Queryable for QueryFile<'a> {
                 },
                 None => None,
             },
-
+            "mimetype" => Some(format!("{}", mime_guess::guess_mime_type(self.path))),
             _ => None,
         }
     }
