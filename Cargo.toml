@@ -1,6 +1,6 @@
 [package]
 authors = ["David Barnett <david@barnett.net.nz>"]
-name = "query-file"
+name = "liquery-file"
 version = "0.1.0"
 
 [dependencies]
