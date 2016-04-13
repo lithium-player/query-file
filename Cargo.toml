@@ -1,0 +1,11 @@
+[package]
+authors = ["David Barnett <david@barnett.net.nz>"]
+name = "query-file"
+version = "0.1.0"
+
+[dependencies]
+mime_guess = "1.6.1"
+
+[dependencies.liquery]
+git = "https://github.com/lithium-player/query"
+optional = false
