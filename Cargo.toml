@@ -9,3 +9,6 @@ mime_guess = "1.6.1"
 [dependencies.liquery]
 git = "https://github.com/lithium-player/query"
 optional = false
+
+[features]
+unstable = []
