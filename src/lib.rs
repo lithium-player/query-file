@@ -99,7 +99,6 @@ mod tests {
 
     query_test!(file_type_file, "filetype", "file");
     query_test!(file_type_dir, "filetype", "directory", "tests");
-    query_test!(file_type_symlink, "filetype", "symlink", "tests/target");
 
     query_test!(file_name, "filename", "file_1b.txt");
     query_test!(file_name_dir, "filename", "tests", "tests");
