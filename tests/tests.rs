@@ -1,72 +1,32 @@
 extern crate liquery;
 extern crate liquery_file;
 
+use std::collections::HashMap;
+
 use liquery_file::QueryFile;
-use liquery::Queryable;
+use liquery::{Query, EvalFunc};
 use std::path::Path;
 
-// TODO: refactor with macro
+macro_rules! query_test {
+    ($name: ident, $query: expr, $out: expr) => {
+        query_test!($name, $query, $out, "tests/file_1b.txt");
+    };
+    ($name: ident, $query: expr, $out: expr, $path: expr) => {
+        #[test]
+        fn $name() {
+            let path = Path::new($path);
+            let queryable = QueryFile::new(path).unwrap();
 
-#[test]
-fn size_of_file() {
-    let path = Path::new("tests/file_1b.txt");
-    let queryable = QueryFile::new(path).unwrap();
+            let func = HashMap::<String, Box<EvalFunc>>::new();
 
-    assert_eq!("1", &queryable.query("size").unwrap());
+            let result = Query::parse($query.to_owned())
+                .unwrap()
+                .eval(&queryable, &func)
+                .unwrap();
+
+            assert_eq!($out, result);
+        }
+    };
 }
 
-#[test]
-fn file_type_file() {
-    let path = Path::new("tests/file_1b.txt");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!("file", &queryable.query("filetype").unwrap());
-}
-
-#[test]
-fn file_type_dir() {
-    let path = Path::new("tests");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!("directory", &queryable.query("filetype").unwrap());
-}
-
-#[test]
-fn file_name_dir() {
-    let path = Path::new("tests");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!("tests", &queryable.query("filename").unwrap());
-}
-
-#[test]
-fn file_name() {
-    let path = Path::new("tests/file_1b.txt");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!("file_1b.txt", &queryable.query("filename").unwrap());
-}
-
-#[test]
-fn file_extension() {
-    let path = Path::new("tests/file_1b.txt");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!("txt", &queryable.query("extension").unwrap());
-}
-
-#[test]
-fn file_extension_dir() {
-    let path = Path::new("tests");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!(None, queryable.query("extension"));
-}
-
-#[test]
-fn file_mime() {
-    let path = Path::new("tests/file_1b.txt");
-    let queryable = QueryFile::new(path).unwrap();
-
-    assert_eq!("text/plain", &queryable.query("mimetype").unwrap());
-}
+query_test!(filename_query, "%filename%", "file_1b.txt");

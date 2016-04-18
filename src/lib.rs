@@ -1,5 +1,6 @@
 //! # liquery-file
-//!
+//! A library to make queryable files for the liquery `Queryable`
+//! trait.
 
 extern crate liquery;
 extern crate mime_guess;
@@ -55,4 +56,56 @@ impl <'a>  Queryable for QueryFile<'a> {
             _ => None,
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    extern crate liquery;
+    use super::*;
+    use liquery::Queryable;
+    use std::path::Path;
+
+    macro_rules! query_test {
+        ($name: ident, $field: expr, $out: expr) => {
+            query_test!($name, $field, $out, "tests/file_1b.txt");
+        };
+        ($name: ident, $field: expr, $out: expr, $path: expr) => {
+            #[test]
+            fn $name() {
+                let path = Path::new($path);
+                let queryable = QueryFile::new(path).unwrap();
+
+                assert_eq!($out, &queryable.query($field).unwrap());
+            }
+        };
+    }
+
+    macro_rules! query_test_no_result {
+        ($name: ident, $field: expr) => {
+            query_test!($name, $field, "tests/file_1b.txt");
+        };
+        ($name: ident, $field: expr, $path: expr) => {
+            #[test]
+            fn $name() {
+                let path = Path::new($path);
+                let queryable = QueryFile::new(path).unwrap();
+
+                assert_eq!(None, queryable.query($field));
+            }
+        };
+    }
+
+    query_test!(size_of_file, "size", "1");
+
+    query_test!(file_type_file, "filetype", "file");
+    query_test!(file_type_dir, "filetype", "directory", "tests");
+
+    query_test!(file_name, "filename", "file_1b.txt");
+    query_test!(file_name_dir, "filename", "tests", "tests");
+
+    query_test!(file_extension, "extension", "txt");
+    query_test_no_result!(file_extension_dir, "extension", "tests");
+
+    query_test!(file_mime, "mimetype", "text/plain");
+    query_test!(file_mime_rust, "mimetype", "text/x-rust", "src/lib.rs");
 }
