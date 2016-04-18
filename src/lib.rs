@@ -82,7 +82,7 @@ mod tests {
 
     macro_rules! query_test_no_result {
         ($name: ident, $field: expr) => {
-            query_test!($name, $field, "tests/file_1b.txt");
+            query_test_no_result!($name, $field, "tests/file_1b.txt");
         };
         ($name: ident, $field: expr, $path: expr) => {
             #[test]
@@ -108,4 +108,7 @@ mod tests {
 
     query_test!(file_mime, "mimetype", "text/plain");
     query_test!(file_mime_rust, "mimetype", "text/x-rust", "src/lib.rs");
+
+    query_test_no_result!(unkown_feild, "unkown");
+    query_test_no_result!(empty_feild, "");
 }
