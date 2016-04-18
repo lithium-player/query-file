@@ -39,15 +39,15 @@ impl <'a>  Queryable for QueryFile<'a> {
                 }
             },
             "extension" => match self.path.extension() {
-                Some(ostr) => match ostr.to_str() {
-                    Some(pstr) => Some(pstr.to_owned()),
+                Some(os_str) => match os_str.to_str() {
+                    Some(s) => Some(s.to_owned()),
                     None => None,
                 },
                 None => None,
             },
             "filename" => match self.path.file_name() {
-                Some(ostr) => match ostr.to_str() {
-                    Some(pstr) => Some(pstr.to_owned()),
+                Some(os_str) => match os_str.to_str() {
+                    Some(s) => Some(s.to_owned()),
                     None => None,
                 },
                 None => None,
@@ -99,6 +99,7 @@ mod tests {
 
     query_test!(file_type_file, "filetype", "file");
     query_test!(file_type_dir, "filetype", "directory", "tests");
+    query_test!(file_type_symlink, "filetype", "symlink", "tests/target");
 
     query_test!(file_name, "filename", "file_1b.txt");
     query_test!(file_name_dir, "filename", "tests", "tests");
