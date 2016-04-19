@@ -10,12 +10,34 @@ use std::fs::Metadata;
 
 use liquery::Queryable;
 
+/// A Queryable instance of a file
 pub struct QueryFile<'a> {
     metadata: Metadata,
     path: &'a Path,
 }
 
+/// Query the file for some information
+///
+/// # Queryable fields
+///
+/// * `size` - returns size of file in bytes
+/// * `filetype` - returns `file` if path points to file,
+/// `directory` if path points to directory and `symlink` if path points to a symlink.
+/// * `extension` - returns file extension, see [`Path::extension()`](http://doc.rust-lang.org/std/path/struct.Path.html#method.extension) for more details.
+/// * `filename` - returns the file name
+/// * `mimetype` - returns a guess of the mimetype based off the file name
 impl <'a> QueryFile<'a> {
+
+    /// Get a new instance of a QueryFile
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use liquery_file::QueryFile;
+    /// use std::path::Path;
+    ///
+    /// let queryable = QueryFile::new(Path::new("file.txt"));
+    /// ```
     pub fn new(path: &'a Path) -> std::io::Result<Self> {
         Ok(QueryFile {
             metadata: try!(path.metadata()),
@@ -25,6 +47,7 @@ impl <'a> QueryFile<'a> {
 }
 
 impl <'a>  Queryable for QueryFile<'a> {
+
     fn query(&self, key: &str) -> Option<String> {
         match key {
             "size" => Some(format!("{}", self.metadata.len())),
