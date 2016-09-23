@@ -5,15 +5,15 @@
 extern crate liquery;
 extern crate mime_guess;
 
-use std::path::Path;
+use std::path::{PathBuf, Path};
 use std::fs::Metadata;
 
 use liquery::Queryable;
 
 /// A Queryable instance of a file
-pub struct QueryFile<'a> {
+pub struct QueryFile {
     metadata: Metadata,
-    path: &'a Path,
+    path: PathBuf,
 }
 
 /// Query the file for some information
@@ -26,7 +26,7 @@ pub struct QueryFile<'a> {
 /// * `extension` - returns file extension, see [`Path::extension()`](http://doc.rust-lang.org/std/path/struct.Path.html#method.extension) for more details.
 /// * `filename` - returns the file name
 /// * `mimetype` - returns a guess of the mimetype based off the file name
-impl <'a> QueryFile<'a> {
+impl QueryFile {
 
     /// Get a new instance of a QueryFile
     ///
@@ -34,19 +34,18 @@ impl <'a> QueryFile<'a> {
     ///
     /// ```
     /// use liquery_file::QueryFile;
-    /// use std::path::Path;
     ///
-    /// let queryable = QueryFile::new(Path::new("file.txt"));
+    /// let queryable = QueryFile::new("file.txt");
     /// ```
-    pub fn new(path: &'a Path) -> std::io::Result<Self> {
+    pub fn new<P: AsRef<Path>>(path: P) -> std::io::Result<Self> {
         Ok(QueryFile {
-            metadata: try!(path.metadata()),
-            path: path,
+            metadata: try!(path.as_ref().metadata()),
+            path: path.as_ref().to_owned(),
         })
     }
 }
 
-impl <'a>  Queryable for QueryFile<'a> {
+impl Queryable for QueryFile {
 
     fn query(&self, key: &str) -> Option<String> {
         match key {
@@ -75,7 +74,7 @@ impl <'a>  Queryable for QueryFile<'a> {
                 },
                 None => None,
             },
-            "mimetype" => Some(format!("{}", mime_guess::guess_mime_type(self.path))),
+            "mimetype" => Some(format!("{}", mime_guess::guess_mime_type(&self.path))),
             _ => None,
         }
     }
@@ -83,10 +82,8 @@ impl <'a>  Queryable for QueryFile<'a> {
 
 #[cfg(test)]
 mod tests {
-    extern crate liquery;
     use super::*;
     use liquery::Queryable;
-    use std::path::Path;
 
     macro_rules! query_test {
         ($name: ident, $field: expr, $out: expr) => {
@@ -95,8 +92,7 @@ mod tests {
         ($name: ident, $field: expr, $out: expr, $path: expr) => {
             #[test]
             fn $name() {
-                let path = Path::new($path);
-                let queryable = QueryFile::new(path).unwrap();
+                let queryable = QueryFile::new($path).unwrap();
 
                 assert_eq!($out, &queryable.query($field).unwrap());
             }
@@ -110,8 +106,7 @@ mod tests {
         ($name: ident, $field: expr, $path: expr) => {
             #[test]
             fn $name() {
-                let path = Path::new($path);
-                let queryable = QueryFile::new(path).unwrap();
+                let queryable = QueryFile::new($path).unwrap();
 
                 assert_eq!(None, queryable.query($field));
             }

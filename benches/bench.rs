@@ -4,8 +4,6 @@ extern crate liquery;
 extern crate liquery_file;
 extern crate test;
 
-use std::path::Path;
-
 use test::Bencher;
 use liquery::Queryable;
 use liquery_file::QueryFile;
@@ -13,14 +11,14 @@ use liquery_file::QueryFile;
 #[bench]
 fn bench_new_file(b: &mut Bencher) {
     b.iter(move || {
-        let _ = QueryFile::new(Path::new("tests/file_1b.txt"));
+        let _ = QueryFile::new("tests/file_1b.txt");
     });
 }
 
 #[bench]
 fn bench_new_dir(b: &mut Bencher) {
     b.iter(move || {
-        let _ = QueryFile::new(Path::new("tests"));
+        let _ = QueryFile::new("tests");
     });
 }
 
@@ -31,7 +29,7 @@ macro_rules! bench_query {
     ($name: ident, $query: expr, $path: expr) => {
         #[bench]
         fn $name(b: &mut Bencher) {
-            let file = QueryFile::new(Path::new($path)).unwrap();
+            let file = QueryFile::new($path).unwrap();
             b.iter(move || {
                 let _ = file.query($query);
             });
